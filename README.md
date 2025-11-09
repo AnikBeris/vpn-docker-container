@@ -1,1 +1,492 @@
-# vpn-docker-container
+<p align="center">
+  <strong>-------></strong> 
+  <a href="/README_en_EN.md">English</a> | 
+  <a href="/README.md">Русский</a> 
+  <strong><-------</strong>
+</p>
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="./media/logo-dark.png">
+    <img alt="Project Logo" src="./media/logo-light.png" width="512" height="auto">
+  </picture>
+</p>
+
+<div align="center">
+
+[![GitHub](https://img.shields.io/badge/GitHub-blue?style=flat&logo=github)](https://github.com/AnikBeris)
+[![License](https://img.shields.io/badge/License-purple?style=flat&logo=github)](/LICENSE.md)
+[![GitHub Stars](https://img.shields.io/github/stars/AnikBeris?style=flat&logo=github&label=Звёзды&color=orange)](https://github.com/AnikBeris)
+
+</div>
+
+<div align="center">
+  <img src="./media/image0.gif" alt="SPACER" width="90%">
+</div>
+
+
+
+<h1 align="center"> 🐳 VPN для Docker-контейнеров с 3x-ui и Xray (Tutorial) </h1>
+
+<h2 align="left">
+Эта статья документирует процесс настройки и подключения <code>VPN</code> для любых <code>Docker</code>-контейнеров с помощью <code>3x-ui</code> и клиента <code>Xray</code>.
+</h2>
+
+<h2 align="left">
+💡 Материал ориентирован на разработчиков и DevOps-инженеров и людей которые хотят подключить свои контейнера к защищённому VPN протоколам без изменения сети хоста.
+</h2>
+
+
+
+
+* * * * * * * * * * * * * * * * * * 
+* * * * * * * * * * * * * * * * * * 
+
+
+
+
+<h2 align="center">
+⚠️ Отказ от ответственности
+</h2>
+
+<p align="center">
+  Автор не несёт ответственности за любые возможные последствия использования данного проекта.<br>
+  Используйте на свой страх и риск.
+</p>
+
+---
+
+<h3 align="center"> 
+💖 Поддержите проект 
+</h3>
+
+<p align="center"> 
+Если этот проект оказался полезным для Вас, вы можете оценить его, поставив звёздочку.:star2: 
+</p>
+
+<p align="left">
+  <a href="https://pay.cloudtips.ru/p/7249ba98" target="_blank">
+    <img src="./media/buymeacoffe.png" alt="Buy Me a Coffee">
+  </a>
+</p>
+
+
+
+<h4 align="center"> 
+Пожертвования горячо приветствуются, какими бы маленькими они ни были, и большое спасибо. 😌 
+</h1>
+
+<div align="center">
+
+|  |  |
+|-------------:|:-------------|
+| **Tether USDT (BEP20)** |`0x22258ea591966e830199d27dea7c542f31ed5dc5`|
+| **Bitcoin (BTC)** |`1Dbwq9EP8YpF3SrLgag2EQwGASMSGLADbh`|
+| **Ethereum (ERC20)** | `0x22258ea591966e830199d27dea7c542f31ed5dc5`|
+| **Binance Smart Chain (BEP20)** | `0x22258ea591966e830199d27dea7c542f31ed5dc5`|
+| **Solana (SOL)** | `yYYXsiVTzsvfvsMnBxfxSZEWTGytjAViE2ojf3hbLeF`|
+| **Cloud tips** | [cloudtips](https://pay.cloudtips.ru/p/7249ba98) |
+
+</div>
+
+---
+
+<p align="center">
+  <sub> Спасибо за Ваше внимание к проекту и за поддержку 💙 </sub>
+</p>
+
+---
+
+* * * * * * * * * * * * * * * * * * 
+* * * * * * * * * * * * * * * * * * 
+
+
+
+## 📚 Содержание
+
+- [Введение](#-введение)
+1. [Настройка статистики](#-1-настройка-статистики)
+2. [Создание таблицы лидеров (Leaderboard)](#-2-создание-таблицы-лидеров-leaderboard)
+3. [Настройка достижений (Achievements)](#-3-настройка-достижений-achievements)
+
+- [Чертёж логики (Blueprint)](#-чертёж-логики-blueprint)
+4. [Прописываем Steam в конфигах Unreal Engine 5](#-4-подключение-steamworks-steam-к-unreal-engine-5)
+5. [Чтение статистики](#-5-чтение-статистики)
+6. [Работа со статистикой](#-6-работа-со-статистикой)
+7. [Сброс статистики и достижений](#-7-сброс-статистики)
+
+8. [Кодовая часть (Blueprints в Unreal Engine 5)](#-8-кодовая-часть-в-unreal-engine-5-blueprints)
+
+
+
+## 🔗 Полезные ссылки
+- [Статистика и достижения](https://partner.steamgames.com/doc/features/achievements#1)
+- [AVGRATE-статистика](https://partner.steamgames.com/doc/features/achievements#AVGRATE)
+- [Сброс статистик](https://partner.steamgames.com/doc/features/achievements#9)
+- [Общая статистика](https://partner.steamgames.com/doc/features/achievements#global_stats)
+- [Достижения](https://partner.steamgames.com/doc/features/achievements/ach_guide)
+- [Статистики](https://partner.steamgames.com/doc/features/achievements/stats_guide)
+
+* * * * * * * * * * * * * * * * * * 
+* * * * * * * * * * * * * * * * * * 
+
+
+
+
+# 🎮 История о том, как я настраиваю достижения, статистику и таблицы лидеров в Steamworks
+
+## 📊 Вводная информация
+
+<h2 align="Left"> 
+Установка и настройка цепочку програм для того, что бы мы не переживали за перехват и потерю важных данных. 3x-ui -> clash-meta -> yacd-meta -> dockpeek
+
+</h2>
+
+
+
+
+
+
+<h2 align="center">
+  <a href="#-содержание">⬆️ Наверх</a> 
+</h2>
+
+# 📊 3x-ui
+
+## 📊 Установка 3x-ui
+
+<details> 
+    <summary>⚙️ Развернуть описание</summary>
+
+
+[📄 docker-compose.yml](./3x-ui/docker-compose.yml)
+
+
+```yml
+networks:
+  3x-ui_network:
+    name: 3x-ui_network
+    driver: bridge
+
+services:
+  3xui:
+#    image: ghcr.io/mhsanaei/3x-ui:latest  # обновления не частые
+    image: bigbugcc/3x-ui:latest
+    container_name: 3xui_app
+    restart: unless-stopped
+    volumes:
+      - ./x-ui_db/:/etc/x-ui/
+      - ./x-ui_cert/:/root/cert/
+    environment:
+      XRAY_VMESS_AEAD_FORCED: "false"
+      XUI_ENABLE_FAIL2BAN: "true" 
+    tty: true
+    ports:
+      - 2053:2053/tcp
+      - 9501:9501
+      - 9502:8502 # <- порт для впн
+      - 9503:9503 # <- порт для впн
+      - 9504:9504 # <- порт для впн
+      - 9505:9505 # <- порт для впн
+      - 9506:9506 # <- порт для впн
+      - 9507:9507 # <- порт для впн
+      - 9508:9508 # <- порт для впн
+      - 9509:9509 # <- порт для впн
+      - 9510:9510 # <- порт для впн
+
+    networks:
+      - 3x-ui_network
+```
+
+</details> 
+
+## 📊 Настройка 3x-ui
+
+<details> 
+    <summary>⚙️ Развернуть описание</summary>
+
+
+</details> 
+
+---
+
+<h2 align="center">
+  <a href="#-содержание">⬆️ Наверх</a> 
+</h2>
+
+# 📊 yacd-meta | clash-meta
+
+## 📊 Установка yacd-meta и clash-meta
+
+<details> 
+    <summary>⚙️ Развернуть описание</summary>
+
+[📄 docker-compose.yml](./yacd-clash-meta/docker-compose.yml)
+
+
+<h2 align="center"> clash-meta + UI yacd-meta</h2>
+
+```yml
+version: '3.8'
+
+networks:
+  VPN_network:
+    name: VPN_network
+    driver: bridge
+
+services:
+  clash-meta:
+    image: metacubex/clash-meta:latest
+    container_name: clash-meta
+    restart: unless-stopped
+    ports:
+      - "6092:7890"   # Прокси порт (SOCKS5 / HTTP)
+      - "6090:9090"   # API порт
+    volumes:
+      - ./config:/root/.config/clash
+    depends_on:
+      - yacd-meta
+
+    networks:
+      - VPN_network
+
+  yacd-meta:
+    image: asnil/yacd-meta:latest
+    container_name: clash-ui-yacd-meta
+    restart: unless-stopped
+    ports:
+      - "6093:80"  # Web UI порт
+
+    networks:
+      - VPN_network
+
+```
+
+
+
+<h2 align="center"> metube </h2>
+
+```yml
+
+version: '3.8'
+
+networks:
+  n8n_network:
+    name: metube_network
+    driver: bridge
+
+services:
+  clash-meta:
+    image: metacubex/clash-meta:latest
+    container_name: metube-clash-meta
+    restart: unless-stopped
+    ports:
+      - "5010:7890"   # Прокси порт (SOCKS5 / HTTP)
+      - "5011:9090"   # API порт
+    volumes:
+      - ./config:/root/.config/clash
+    depends_on:
+      - yacd-meta
+
+    networks:
+      - metube_network
+
+  yacd-meta:
+    image: asnil/yacd-meta:latest
+    container_name: metube-clash-ui
+    restart: unless-stopped
+    ports:
+      - "5012:80"  # Web UI порт
+
+    networks:
+      - metube_network
+
+  metube:
+    image: alexta69/metube:latest
+    container_name: metube
+    ports:
+      - "5013:8081"
+    volumes:
+      - ./downloads:/downloads
+    restart: always
+
+############ подключение к metube-clash-meta
+    environment:
+      HTTP_PROXY: http://metube-clash-meta:7890
+      HTTPS_PROXY: http://metube-clash-meta:7890
+      NO_PROXY: localhost,127.0.0.1,clash-meta
+
+    networks:
+      - metube_network
+```
+
+</details> 
+
+## 📊 Настройка yacd-meta
+
+<details> 
+    <summary>⚙️ Развернуть описание</summary>
+
+Конфиг для clash-meta
+```yml
+mixed-port: 7890
+allow-lan: true
+mode: rule
+log-level: debug # временно для диагностики
+external-controller: 0.0.0.0:9090
+dns:
+  enable: true
+  enhanced-mode: fake-ip
+  default-nameserver:
+    - 77.88.8.8 # Yandex DNS
+    - 94.140.14.14 # AdGuard DNS
+    - 1.1.1.1 # Cloudflare
+    - 8.8.8.8
+    - 1.0.0.1
+  nameserver:
+    - https://1.1.1.1/dns-query#PROXY
+    - https://8.8.8.8/dns-query#PROXY
+    - https://1.0.0.1/dns-query#PROXY
+    - 77.88.8.8 # Yandex DNS
+    - 94.140.14.14 # AdGuard DNS
+    - 1.1.1.1 # Cloudflare
+  fallback:
+    - 9.9.9.9 # Google DNS
+    - 1.0.0.1 # Cloudflare Backup
+
+proxies:
+- name: "3x-ui-server"
+  type: vless
+  server: 00.00.00.000 <- замените на свой IP
+  port: 43312 <- замените на свой порт
+  uuid: 2d8380e4-03d8-4d30-969c-e27e9e433448
+  network: tcp
+  tls: true
+  udp: true
+  security: reality
+  reality-opts:
+    public-key: "IqWRCskUdICE9GkU-but1FscDNEfy-p2ujq_S0X4bnY"
+    short-id: "0761295863"
+    spider-x: "/"
+  servername: "google.com"
+  client-fingerprint: "chrome"
+  flow: "" # для vless без xtls
+
+proxy-groups:
+- name: "Proxy"
+  type: select
+  proxies:
+  - "3x-ui-server"
+  - "DIRECT"
+
+rules:
+
+# ВАЖНО: Добавьте исключения для Docker сети
+  - IP-CIDR,172.16.0.0/12,DIRECT # Docker сети
+  - IP-CIDR,192.168.0.0/16,DIRECT # Локальные сети
+  - IP-CIDR,10.0.0.0/8,DIRECT # Private networks
+  
+  - DOMAIN-SUFFIX,seatable.io,DIRECT
+
+# github
+  - DOMAIN-SUFFIX,github.com,DIRECT
+  - DOMAIN-SUFFIX,githubusercontent.com,DIRECT
+  - DOMAIN-SUFFIX,githubassets.com,DIRECT
+  - DOMAIN-SUFFIX,telegram.org,DIRECT
+
+  - GEOIP,LAN,DIRECT
+  - GEOIP,Fast-RU,DIRECT
+  - GEOIP,RU,DIRECT
+  
+  - MATCH,Proxy
+```
+
+</details>  
+
+---
+
+
+<h2 align="center">
+  <a href="#-содержание">⬆️ Наверх</a> 
+</h2>
+
+# 📊 dockpeek
+
+## 📊 Установка dockpeek
+
+<details> 
+    <summary>⚙️ Развернуть описание</summary>
+
+[📄 docker-compose.yml](./dockpeek/docker-compose.yml)
+
+```yml
+
+networks:
+  dockpeek_network:
+    name: dockpeek_network
+    driver: bridge
+
+
+services:
+  dockpeek:
+    image: ghcr.io/dockpeek/dockpeek:latest
+    container_name: dockpeek
+    restart: unless-stopped
+    environment:
+      - SECRET_KEY=asdqwe123         # Обязательно укажите надёжный секретный ключ
+      - USERNAME=admin               # Обязательно измените имя пользователя на свой
+      - PASSWORD=asdqwe123           # Обязательно измените пароль на свой
+    ports:
+      - "3420:8000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+    networks:
+      - dockpeek_network
+
+```
+
+</details> 
+
+## 📊 Настройка dockpeek
+
+<details> 
+    <summary>⚙️ Развернуть описание</summary>
+
+
+</details> 
+
+---
+
+
+
+
+
+
+* * * * * * * * * * * * * * * * * * 
+* * * * * * * * * * * * * * * * * * 
+
+
+
+
+<h1 align="center"> 📜 Лицензия </h1>
+<p align="center">
+  <strong> Этот проект распространяется по </strong> 
+  <a href="/LICENSE">MIT License</a> 
+</p>
+
+---
+
+<h2 align="center"> 
+Документация ознакомьтесь с ней 
+</h2>
+
+<p align="center">
+  <strong>-------></strong> 
+  <a href="/README_en_EN.md"> English </a> | 
+  <a href="/README.md"> Русский </a> 
+  <strong><-------</strong>
+</p>
+
+
+
