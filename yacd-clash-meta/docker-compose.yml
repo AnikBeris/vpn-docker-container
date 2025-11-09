@@ -1,0 +1,32 @@
+version: '3.8'
+
+networks:
+  VPN_network:
+    name: VPN_network
+    driver: bridge
+
+services:
+  clash-meta:
+    image: metacubex/clash-meta:latest
+    container_name: clash-meta
+    restart: unless-stopped
+    ports:
+      - "6092:7890"   # Прокси порт (SOCKS5 / HTTP)
+      - "6090:9090"   # API порт
+    volumes:
+      - ./config:/root/.config/clash
+    depends_on:
+      - yacd-meta
+
+    networks:
+      - VPN_network
+
+  yacd-meta:
+    image: asnil/yacd-meta:latest
+    container_name: clash-ui-yacd-meta
+    restart: unless-stopped
+    ports:
+      - "6093:80"  # Web UI порт
+
+    networks:
+      - VPN_network

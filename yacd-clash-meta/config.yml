@@ -1,0 +1,70 @@
+mixed-port: 7890
+allow-lan: true
+mode: rule
+log-level: debug # временно для диагностики
+external-controller: 0.0.0.0:9090
+dns:
+  enable: true
+  enhanced-mode: fake-ip
+  default-nameserver:
+  - 77.88.8.8 # Yandex DNS
+  - 94.140.14.14 # AdGuard DNS
+  - 1.1.1.1 # Cloudflare
+  - 8.8.8.8
+  - 1.0.0.1
+  nameserver:
+  - https://1.1.1.1/dns-query#PROXY
+  - https://8.8.8.8/dns-query#PROXY
+  - https://1.0.0.1/dns-query#PROXY
+  - 77.88.8.8 # Yandex DNS
+  - 94.140.14.14 # AdGuard DNS
+  - 1.1.1.1 # Cloudflare
+  fallback:
+  - 9.9.9.9 # Google DNS
+  - 1.0.0.1 # Cloudflare Backup
+
+proxies:
+- name: "3x-ui-server"
+  type: vless
+  server: 00.00.00.000 <- замените на свой IP
+  port: 43312 <- замените на свой порт
+  uuid: 2d8380e4-03d8-4d30-969c-e27e9e433448
+  network: tcp
+  tls: true
+  udp: true
+  security: reality
+  reality-opts:
+    public-key: "IqWRCskUdICE9GkU-but1FscDNEfy-p2ujq_S0X4bnY"
+    short-id: "0761295863"
+    spider-x: "/"
+  servername: "google.com"
+  client-fingerprint: "chrome"
+  flow: "" # для vless без xtls
+
+proxy-groups:
+- name: "Proxy"
+  type: select
+  proxies:
+  - "3x-ui-server"
+  - "DIRECT"
+
+rules:
+
+# ВАЖНО: Добавьте исключения для Docker сети
+- IP-CIDR,172.16.0.0/12,DIRECT # Docker сети
+- IP-CIDR,192.168.0.0/16,DIRECT # Локальные сети
+- IP-CIDR,10.0.0.0/8,DIRECT # Private networks
+
+- DOMAIN-SUFFIX,seatable.io,DIRECT
+
+# github
+- DOMAIN-SUFFIX,github.com,DIRECT
+- DOMAIN-SUFFIX,githubusercontent.com,DIRECT
+- DOMAIN-SUFFIX,githubassets.com,DIRECT
+- DOMAIN-SUFFIX,telegram.org,DIRECT
+
+- GEOIP,LAN,DIRECT
+- GEOIP,Fast-RU,DIRECT
+- GEOIP,RU,DIRECT
+
+- MATCH,Proxy
